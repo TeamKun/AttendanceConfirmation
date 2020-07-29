@@ -1,6 +1,5 @@
 import pandas as pd
 import glob
-import math
 
 #複数ファイル読み込み。1つのデータフレームに。
 allFiles = glob.glob("Source/*.csv")
@@ -10,7 +9,9 @@ for file_ in allFiles:
     df = pd.read_csv(file_,index_col=None,header=0,encoding="utf-8")
     #Discord ID でユニーク化
     df = df.drop_duplicates(["Discord ID"])
-    list_.append(df)
+    list_.append(df[["Discord ID","Discord 名前"]])
 df = pd.concat(list_)
-df = df["Discord ID"].value_counts()
+def hidetag(x):
+    return x.rpartition("#")[0]
+df["Discord 名前"] = df["Discord 名前"].map(hidetag)
 df.to_csv("Output/output.csv")
