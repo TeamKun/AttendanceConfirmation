@@ -1,21 +1,11 @@
-import csv
+import pandas as pd
+import glob
 
-CountDic = {}
-#入退室判定に利用する人のDiscordID
-SessionHostId = "213535369881190401"
-#CSV展開
-with open(r"C:\Users\20170511\Desktop\Graph from CSV\Graph from CSV\2020-07-29.csv",encoding='utf8') as f:
-    reader = csv.reader(f)
-    #ヘッダーをスキップ
-    skip = next(reader)
-    #readerをリストに格納
-    l = [row for row in reader]
-
-    for i in range(len(l)):
-        member = l[i][3]
-        CountDic.setdefault(member, 0)
-        CountDic[member] += 1
-        #if l[i + 1][2] == SessionHostId:
-            #break
-for key, value in CountDic.items():
-    print('{}: {}'.format(key, value))
+#複数ファイル読み込み。1つのデータフレームに。
+allFiles = glob.glob("*.csv")
+frame = pd.DataFrame()
+list_ = []
+for file_ in allFiles:
+    df = pd.read_csv(file_,index_col=None,header=0,encoding="utf-8")
+    list_.append(df)
+df = pd.concat(list_)
