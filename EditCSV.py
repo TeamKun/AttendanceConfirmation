@@ -1,8 +1,8 @@
 import pandas as pd
 import glob
 import gspread
-import json
-from oauth2client.service_account import ServiceAccountCredentials 
+from oauth2client.service_account import ServiceAccountCredentials
+from apiclient import discovery
 
 #複数ファイル読み込み準備
 allFiles = glob.glob("Source/*.csv")
@@ -28,18 +28,19 @@ credentials = ServiceAccountCredentials.from_json_keyfile_name('alpine-task-2836
 #GoogleAPIにログイン
 gc = gspread.authorize(credentials)
 
-#スプレッドシートキー
-SPREADSHEET_KEY = "1b81qXNJ2R1KxEcMx-n77blXHzGrDM6CkLu_7eWX-Znw"
+#データフレームを文字列型に変換
+df = df[["Discord ID"]].astype(str)
 
-#共有設定したスプレッドシートのデータを開く
-wks = gc.open_by_key(SPREADSHEET_KEY).worksheet("データ")
+#データを入れるスプレッドシートと範囲を指定
+spreadsheet_id = ""
+sheet_name = "データ"
+sheet_range = "A2"
+_range = f"{sheet_name}!{sheet_range}"
 
-#編集する範囲を指定
-cell_list = wks.range('A1:A'+str(len(df)))
-
-#スプレッドシートにデータを流し込む
-for i,cell in enumerate(cell_list):
-    cell.value = df[["Discord ID"]]
-
-#最終反映
-wks.update_cells(wks.range('A1:A'+str(len(df))))
+#データを入れる
+dat = df.values.tolist()
+body = {"values": dat}
+value_input_option = "USER_ENTERED"
+service = discovery.build('sheets', 'v4', credentials= credentials)
+request = service.spreadsheets().values().update(spreadsheetId=spreadsheet_id,valueInputOption=value_input_option,range=_range,body=body)
+request.execute()
