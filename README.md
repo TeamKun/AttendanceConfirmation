@@ -1,3 +1,1 @@
-# Graph from CSV
-https://github.com/Team-Fruit/DiscordVCLog
-で取得したログをスプレッドシートにあげるやつ
+DiscordVCLogで取得したログをPandasで整形してスプレッドシートにアップするまでの.py
